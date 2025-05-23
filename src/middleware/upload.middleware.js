@@ -1,21 +1,10 @@
 const multer = require('multer');
 const path = require('path');
-const fs = require('fs');
-
-// Ensure upload directory exists
-const createUploadDir = () => {
-  const uploadDir = process.env.UPLOAD_DIR || 'src/uploads';
-  if (!fs.existsSync(uploadDir)) {
-    fs.mkdirSync(uploadDir, { recursive: true });
-  }
-  return uploadDir;
-};
 
 // Configure storage
 const storage = multer.diskStorage({
   destination: (req, file, cb) => {
-    const uploadDir = createUploadDir();
-    cb(null, uploadDir);
+    cb(null, process.env.UPLOAD_DIR || 'src/uploads');
   },
   filename: (req, file, cb) => {
     const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1E9);
@@ -36,7 +25,7 @@ const fileFilter = (req, file, cb) => {
   if (allowedTypes.includes(file.mimetype)) {
     cb(null, true);
   } else {
-    cb(new Error(`Invalid file type. Only ${allowedTypes.join(', ')} files are allowed.`), false);
+    cb(new Error('Invalid file type. Only jpg, png, gif, pdf, and mp4 files are allowed.'), false);
   }
 };
 
